@@ -27,6 +27,13 @@
 
 <cart-items class="gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
   <div class="page-width">
+    {% render 'free-shipping-progress',
+      min_value_to_reach: 12000,
+      use_auto_update: true,
+      success_message: 'Great! You’ve unlocked free shipping.',
+      message: 'Spend [remaining] more to get free shipping.',
+      fill_color: '#352f8d'
+    %}
     <div class="title-wrapper-with-link">
       <h1 class="title title--primary">{{ 'sections.cart.title' | t }}</h1>
       <a href="{{ routes.all_products_collection_url }}" class="underlined-link">
