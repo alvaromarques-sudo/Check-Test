@@ -1451,5 +1451,25 @@
         "default": "scheme-1"
       }
     ]
+  },
+  {
+    "name": "Installment Rules",
+    "settings": [
+      {
+        "type": "range",
+        "id": "maximum_number_installments",
+        "label": "Maximum Number of Installments",
+        "max": 24,
+        "min": 1,
+        "step": 1,
+        "default": 12,
+      },
+      {
+        "type": "number",
+        "id": "minimum_amount_per_installment",
+        "label": "Minimum Amount per Installment",
+        "default": 5,
+      }
+    ]
   }
 ]
