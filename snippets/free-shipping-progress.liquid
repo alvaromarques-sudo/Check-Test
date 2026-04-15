@@ -22,7 +22,7 @@
 {% assign message = message | default: 'Spend [remaining] more to get free shipping.' %}
 {% assign use_auto_update = use_auto_update | default: true %}
 
-{% assign cart_current = cart.total_price %}
+{% assign cart_current = cart.original_total_price %}
 {% assign render_custom_message = '' %}
 {% assign render_custom_message_sucess = '' %}
 {% assign rest = min_value_to_reach | minus: cart_current %}
@@ -131,8 +131,8 @@
     })();
 
     window.addEventListener('shopify:update_cart', (event) => {
-      console.log('Cart updated:', event.detail.cart?.total_price);
-      const current_total = parseInt(event.detail.cart?.total_price) || 0;
+      console.log('Cart updated:', event.detail.cart);
+      const current_total = parseInt(event.detail.cart?.original_total_price) || 0;
       const min_value = parseInt('{{min_value_to_reach}}');
 
       const remaining = (min_value - current_total) / 100;
