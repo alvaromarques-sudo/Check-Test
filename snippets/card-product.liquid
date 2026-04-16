@@ -286,6 +286,7 @@
                 </quantity-popover>
               {% endif %}
             {%- endif -%}
+            {% render 'discount-with-pix', price: product.price, text: '[percentage] de desconto no PIX' %}
           </div>
         </div>
         {% assign product_form_id = 'quick-add-' | append: section_id | append: card_product.id %}

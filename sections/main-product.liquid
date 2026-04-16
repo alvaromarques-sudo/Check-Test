@@ -114,6 +114,10 @@
                     price_class: 'price--large'
                   -%}
                 </div>
+                {% render 'discount-with-pix',
+                  price: product.price,
+                  text: '[amount_with_discount] no PIX (economia de [percentage])'
+                %}
                 {%- if product.quantity_price_breaks_configured? -%}
                   <div class="volume-pricing-note" id="Volume-Note-{{ section.id }}">
                     <span>{{ 'products.product.volume_pricing.note' | t }}</span>

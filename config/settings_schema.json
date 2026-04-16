@@ -1451,5 +1451,19 @@
         "default": "scheme-1"
       }
     ]
+  },
+  {
+    "name": "Pix Settings",
+    "settings": [
+      {
+        "type": "range",
+        "min": 1,
+        "max": 100,
+        "default": 5,
+        "unit": "%",
+        "id": "pix_discount_percentage",
+        "label": "Pix Discount Percentage"
+      }
+    ]
   }
 ]

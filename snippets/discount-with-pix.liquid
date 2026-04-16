@@ -1,0 +1,40 @@
+{% doc %}
+  @description Displays the price with a PIX discount and allows custom text formatting using placeholders.
+
+  @param {number} price - The original product price (without discount).
+  @param {string} [text] - Optional text template.
+
+  Supported Placeholders: - '[amount_with_discount]': The final formatted price (e.g., $90.00). - '[percentage]': The
+  discount percentage value (e.g., 10%).
+
+  @example
+  {% render 'pix-discount', price: product.price, text: 'Pay [amount_with_discount] via PIX' %}
+{% enddoc %}
+
+{% assign discount = price | times: settings.pix_discount_percentage | divided_by: 100 %}
+{% assign price_with_discount = product.price | minus: discount %}
+{% assign price_with_discount_formated = price_with_discount | money %}
+{% assign rendered_text = price_with_discount_formated %}
+
+{% if text %}
+  {% if text contains '[amount_with_discount]' %}
+    {% assign text = text | replace: '[amount_with_discount]', price_with_discount_formated %}
+  {% endif %}
+
+  {% if text contains '[percentage]' %}
+    {% assign discount = settings.pix_discount_percentage | append: '%' %}
+    {% assign text = text | replace: '[percentage]', discount %}
+  {% endif %}
+
+  {% assign rendered_text = text %}
+{% endif %}
+
+<strong class="discount_with_pix">
+  {{ rendered_text }}
+</strong>
+
+{% stylesheet %}
+  .discount_with_pix {
+    display: block;
+  }
+{% endstylesheet %}
