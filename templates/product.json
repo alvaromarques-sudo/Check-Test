@@ -23,6 +23,12 @@
         "price": {
           "type": "price"
         },
+        "discount_with_pix_3C8ebc": {
+          "type": "discount-with-pix",
+          "settings": {
+            "discount_message": "[amount_with_discount] no PIX (economia de [percentage])"
+          }
+        },
         "variant_picker": {
           "type": "variant_picker",
           "settings": {
@@ -90,6 +96,7 @@
         "title",
         "caption",
         "price",
+        "discount_with_pix_3C8ebc",
         "variant_picker",
         "quantity_selector",
         "buy_buttons",
