@@ -114,10 +114,6 @@
                     price_class: 'price--large'
                   -%}
                 </div>
-                {% render 'discount-with-pix',
-                  price: product.price,
-                  text: '[amount_with_discount] no PIX (economia de [percentage])'
-                %}
                 {%- if product.quantity_price_breaks_configured? -%}
                   <div class="volume-pricing-note" id="Volume-Note-{{ section.id }}">
                     <span>{{ 'products.product.volume_pricing.note' | t }}</span>
@@ -144,6 +140,8 @@
                     {{ form | payment_terms }}
                   {%- endform -%}
                 </div>
+              {%- when 'discount-with-pix' -%}
+                {% render 'discount-with-pix', price: product.price, text: block.settings.discount_message %}
               {%- when 'inventory' -%}
                 <p
                   class="product__inventory{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.inventory_management != 'shopify' %} visibility-hidden{% endif %}"
@@ -750,6 +748,23 @@
   "blocks": [
     {
       "type": "@app"
+    },
+    {
+      "type": "discount-with-pix",
+      "name": "Discount with Pix",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Supported Placeholders: - '[amount_with_discount]': The final formatted price (e.g., $90.00). - '[percentage]': The discount percentage value (e.g., 10%)."
+        },
+        {
+          "type": "text",
+          "id": "discount_message",
+          "label": "Discount Message",
+          "default": "[amount_with_discount] no PIX (economia de [percentage])"
+        }
+      ]
     },
     {
       "type": "text",
