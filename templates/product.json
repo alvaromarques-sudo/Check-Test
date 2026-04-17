@@ -10,6 +10,10 @@
             "text_style": "uppercase"
           }
         },
+        "tags_Ur9DJf": {
+          "type": "tags",
+          "settings": {}
+        },
         "title": {
           "type": "title"
         },
@@ -87,6 +91,7 @@
       },
       "block_order": [
         "vendor",
+        "tags_Ur9DJf",
         "title",
         "caption",
         "price",

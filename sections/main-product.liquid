@@ -89,6 +89,15 @@
             {%- case block.type -%}
               {%- when '@app' -%}
                 {% render block %}
+              {% when 'tags' %}
+                {% for tag in product.metafields.custom.tags.value %}
+                  <span
+                    class="tag"
+                    style="--background: {{ tag.background_color | default: "#000000" }};--color: {{ tag.text_color | default: "#000000" }}"
+                  >
+                    {{- tag.title -}}
+                  </span>
+                {% endfor %}
               {%- when 'text' -%}
                 <p
                   class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
@@ -1180,6 +1189,11 @@
           "label": "t:sections.main-product.blocks.popup.settings.page.label"
         }
       ]
+    },
+    {
+      "type": "tags",
+      "name": "Tags",
+      "settings": []
     },
     {
       "type": "rating",
