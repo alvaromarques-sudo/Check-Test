@@ -674,6 +674,8 @@
                 </product-recommendations>
               {%- when 'icon-with-text' -%}
                 {% render 'icon-with-text', block: block %}
+              {% when 'buy-together' %}
+                {% render 'buy-together', block: block %}
             {%- endcase -%}
           {%- endfor -%}
           <a href="{{ product.url }}" class="link product__view-details animate-arrow">
@@ -1178,6 +1180,24 @@
           "id": "page",
           "type": "page",
           "label": "t:sections.main-product.blocks.popup.settings.page.label"
+        }
+      ]
+    },
+    {
+      "type": "buy-together",
+      "name": "Buy Together",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Leve Junto e Economize!"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "Adicionar os 2 itens ao Carrinho"
         }
       ]
     },

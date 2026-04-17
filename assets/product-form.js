@@ -6,7 +6,9 @@ if (!customElements.get('product-form')) {
         super();
 
         this.form = this.querySelector('form');
-        this.variantIdInput.disabled = false;
+        if(this.variantIdInput) {
+          this.variantIdInput.disabled = false;
+        }
         this.form.addEventListener('submit', this.onSubmitHandler.bind(this));
         this.cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
         this.submitButton = this.querySelector('[type="submit"]');
@@ -48,7 +50,7 @@ if (!customElements.get('product-form')) {
             if (response.status) {
               publish(PUB_SUB_EVENTS.cartError, {
                 source: 'product-form',
-                productVariantId: formData.get('id'),
+                productVariantId:  formData.get('id') || formData.get('items[0][id]'),
                 errors: response.errors || response.description,
                 message: response.message,
               });
@@ -70,7 +72,7 @@ if (!customElements.get('product-form')) {
             if (!this.error)
               publish(PUB_SUB_EVENTS.cartUpdate, {
                 source: 'product-form',
-                productVariantId: formData.get('id'),
+                productVariantId: formData.get('id') || formData.get('items[0][id]'),
                 cartData: response,
               }).then(() => {
                 CartPerformance.measureFromMarker('add:wait-for-subscribers', startMarker);
@@ -135,7 +137,8 @@ if (!customElements.get('product-form')) {
       }
 
       get variantIdInput() {
-        return this.form.querySelector('[name=id]');
+        const element = this.form.querySelector('[name=id]') || this.form.querySelector('[name="items[0][id]]"')
+        return element;
       }
     }
   );

@@ -39,6 +39,13 @@
             "show_gift_card_recipient": true
           }
         },
+        "buy_together_nbyaMb": {
+          "type": "buy-together",
+          "settings": {
+            "title": "Leve Junto e Economize!",
+            "button_text": "Adicionar os 2 itens ao Carrinho"
+          }
+        },
         "description": {
           "type": "description"
         },
