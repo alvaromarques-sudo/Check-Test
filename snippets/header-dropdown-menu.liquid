@@ -4,10 +4,11 @@
   Usage:
   {% render 'header-dropdown-menu' %}
 {% endcomment %}
+{% assign menu = menu | default: section.settings.menu.links %}
 
 <nav class="header__inline-menu">
   <ul class="list-menu list-menu--inline" role="list">
-    {%- for link in section.settings.menu.links -%}
+    {%- for link in menu -%}
       <li>
         {%- if link.links != blank -%}
           <header-menu>

@@ -27,6 +27,13 @@
 
 <cart-items class="gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
   <div class="page-width">
+    {% render 'free-shipping-progress',
+      min_value_to_reach: section.settings.min_value_to_reach,
+      use_auto_update: section.settings.use_auto_update,
+      success_message: section.settings.success_message,
+      message: section.settings.message,
+      fill_color: section.settings.fill_color
+    %}
     <div class="title-wrapper-with-link">
       <h1 class="title title--primary">{{ 'sections.cart.title' | t }}</h1>
       <a href="{{ routes.all_products_collection_url }}" class="underlined-link">
@@ -490,6 +497,42 @@
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
       "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Progress Bar Settings"
+    },
+    {
+      "type": "number",
+      "id": "min_value_to_reach",
+      "label": "Min Value to Reach Free Shipping",
+      "default": 12000
+    },
+    {
+      "type": "checkbox",
+      "id": "use_auto_update",
+      "label": "Use Auto Update",
+      "info": "This enable the auto update script, so the progress bar update automaticly",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Message",
+      "default": "Great! You’ve unlocked free shipping."
+    },
+    {
+      "type": "text",
+      "id": "message",
+      "label": "Success Message",
+      "default": "Spend [remaining] more to get free shipping.",
+      "info": "Use [remaining] to identify where the remaing price need to be rendered]"
+    },
+    {
+      "type": "color",
+      "id": "fill_color",
+      "label": "Fill Color",
+      "default": "#352f8d"
     }
   ]
 }

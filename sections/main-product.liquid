@@ -89,6 +89,15 @@
             {%- case block.type -%}
               {%- when '@app' -%}
                 {% render block %}
+              {% when 'tags' %}
+                {% for tag in product.metafields.custom.tags.value %}
+                  <span
+                    class="tag"
+                    style="--background: {{ tag.background_color | default: "#000000" }};--color: {{ tag.text_color | default: "#000000" }}"
+                  >
+                    {{- tag.title -}}
+                  </span>
+                {% endfor %}
               {%- when 'text' -%}
                 <p
                   class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
@@ -106,7 +115,7 @@
                   </a>
                 </div>
               {%- when 'price' -%}
-                <div id="price-{{ section.id }}" role="status" {{ block.shopify_attributes }}>
+                <div class="price-container" id="price-{{ section.id }}" role="status" {{ block.shopify_attributes }}>
                   {%- render 'price',
                     product: product,
                     use_variant: true,
@@ -133,13 +142,15 @@
                     {%- endif -%}
                   </div>
                 {%- endif -%}
-                <div {{ block.shopify_attributes }}>
+                <div class="price-container" {{ block.shopify_attributes }}>
                   {%- assign product_form_installment_id = 'product-form-installment-' | append: section.id -%}
                   {%- form 'product', product, id: product_form_installment_id, class: 'installment caption-large' -%}
                     <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
                     {{ form | payment_terms }}
                   {%- endform -%}
                 </div>
+              {%- when 'discount-with-pix' -%}
+                {% render 'discount-with-pix', price: product.price, text: block.settings.discount_message %}
               {%- when 'inventory' -%}
                 <p
                   class="product__inventory{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.inventory_management != 'shopify' %} visibility-hidden{% endif %}"
@@ -674,6 +685,8 @@
                 </product-recommendations>
               {%- when 'icon-with-text' -%}
                 {% render 'icon-with-text', block: block %}
+              {% when 'buy-together' %}
+                {% render 'buy-together', block: block %}
             {%- endcase -%}
           {%- endfor -%}
           <a href="{{ product.url }}" class="link product__view-details animate-arrow">
@@ -746,6 +759,23 @@
   "blocks": [
     {
       "type": "@app"
+    },
+    {
+      "type": "discount-with-pix",
+      "name": "Discount with Pix",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Supported Placeholders: - '[amount_with_discount]': The final formatted price (e.g., $90.00). - '[percentage]': The discount percentage value (e.g., 10%)."
+        },
+        {
+          "type": "text",
+          "id": "discount_message",
+          "label": "Discount Message",
+          "default": "[amount_with_discount] no PIX (economia de [percentage])"
+        }
+      ]
     },
     {
       "type": "text",
@@ -1180,6 +1210,29 @@
           "label": "t:sections.main-product.blocks.popup.settings.page.label"
         }
       ]
+    },
+    {
+      "type": "buy-together",
+      "name": "Buy Together",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Leve Junto e Economize!"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "Adicionar os 2 itens ao Carrinho"
+        }
+      ]
+    },
+    {
+      "type": "tags",
+      "name": "Tags",
+      "settings": []
     },
     {
       "type": "rating",

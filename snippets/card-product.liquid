@@ -203,6 +203,14 @@
                 </span>
               </p>
             {%- endif -%}
+            {% for tag in card_product.metafields.custom.tags.value %}
+              <span
+                class="tag"
+                style="--background: {{ tag.background_color | default: "#000000" }};--color: {{ tag.text_color | default: "#000000" }}"
+              >
+                {{- tag.title -}}
+              </span>
+            {% endfor %}
 
             {% render 'price', product: card_product, price_class: '', show_compare_at_price: true %}
             {%- if card_product.quantity_price_breaks_configured? -%}
@@ -286,6 +294,7 @@
                 </quantity-popover>
               {% endif %}
             {%- endif -%}
+            {% render 'discount-with-pix', price: product.price, text: '[percentage] de desconto no PIX' %}
           </div>
         </div>
         {% assign product_form_id = 'quick-add-' | append: section_id | append: card_product.id %}

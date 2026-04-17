@@ -1451,5 +1451,39 @@
         "default": "scheme-1"
       }
     ]
+  },
+  {
+    "name": "Installment Rules",
+    "settings": [
+      {
+        "type": "range",
+        "id": "maximum_number_installments",
+        "label": "Maximum Number of Installments",
+        "max": 24,
+        "min": 1,
+        "step": 1,
+        "default": 12,
+      },
+      {
+        "type": "number",
+        "id": "minimum_amount_per_installment",
+        "label": "Minimum Amount per Installment",
+        "default": 5,
+      }
+    ]
+  },
+  {
+    "name": "Pix Settings",
+    "settings": [
+      {
+        "type": "range",
+        "min": 1,
+        "max": 100,
+        "default": 5,
+        "unit": "%",
+        "id": "pix_discount_percentage",
+        "label": "Pix Discount Percentage"
+      }
+    ]
   }
 ]

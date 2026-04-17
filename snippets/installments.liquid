@@ -1,0 +1,51 @@
+{% doc %}
+  Calculates and displays the best installment option based on product price,
+  maximum allowed installments, and minimum amount per installment.
+
+  The snippet automatically determines the highest number of installments
+  where each installment value is still greater than or equal to the minimum allowed.
+
+  @param {number} price
+  @param {string} text - The display text. Supports the following placeholders: - [installments] -> Replaced with the number of installments e.g., "12x") - [amount] -> Replaced with the formatted installment value (e.g., "$10.00")
+
+  @example
+  {% render 'installments',
+      price: product.price,
+      text: "Or pay in [installments] of [amount]"
+    %}
+{% enddoc %}
+{% assign max_installments = settings.maximum_number_installments %}
+{% assign min_amount_installments = settings.minimum_amount_per_installment | times: 100 %}
+
+{% assign current_installments = 1 %}
+{% assign current_amount_installments = price %}
+
+{% for i in (1..max_installments) %}
+  {% assign amount_installments = price | divided_by: i %}
+  {% if amount_installments >= min_amount_installments %}
+    {% assign current_installments = i %}
+    {% assign current_amount_installments = amount_installments %}
+  {% else %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if text contains '[installments]' %}
+  {% assign current_installments = current_installments | append: 'x' %}
+  {% assign text = text | replace: '[installments]', current_installments %}
+{% endif %}
+
+{% if text contains '[amount]' %}
+  {% assign current_amount_installments = current_amount_installments | money %}
+  {% assign text = text | replace: '[amount]', current_amount_installments %}
+{% endif %}
+
+<span class="installments">
+  {{ text }}
+</span>
+
+<style>
+  .installments {
+    display: block;
+  }
+</style>
