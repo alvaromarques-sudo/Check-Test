@@ -45,7 +45,13 @@
 </span>
 
 <style>
-  .installments {
-    display: block;
-  }
+    .installments {
+      display: block;
+    }
+
+    {% if template.name == 'cart' %}
+      .installments {
+        text-align: end;
+      }
+  {% endif %}
 </style>
