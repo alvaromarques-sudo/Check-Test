@@ -1,0 +1,348 @@
+{% liquid
+  assign placeholder = placeholder | default: block.settings.placeholder
+  assign btn_text = btn_text | default: block.settings.btn_text
+  assign err_message = err_message | default: block.settings.err_message
+%}
+
+<style>
+  .discount {
+    margin-top: 16px;
+    position: relative;
+  }
+
+  .discount__form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .discount__form input {
+    flex: 1;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+  }
+
+  .discount__form input:focus {
+    outline: none;
+    border-color: #000;
+  }
+
+  .discount__form button {
+    height: 44px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 6px;
+    background: #000;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .discount__form button:hover {
+    opacity: 0.85;
+  }
+
+  .discount__error {
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #d72c2c;
+  }
+
+  .discount__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .discount__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: #f4f4f4;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .discount__remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    color: #666;
+    border-radius: 50%;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .discount__remove:hover {
+    background: #e0e0e0;
+    color: #000;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .discount__feedback {
+    margin: 0;
+    position: absolute;
+    top: 0;
+    z-index: 0;
+    transition: top 0.6s ease-in-out, opacity 0.3s ease-in-out;
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 4px;
+    box-shadow: 0px 1px 4px #0000002e;
+    opacity: 0;
+  }
+
+  .discount__feedback:empty {
+    display: block;
+  }
+
+  .discount__feedback-active {
+    top: -50px;
+    opacity: 1;
+  }
+</style>
+
+<div class="discount">
+  <form class="discount__form">
+    <input
+      type="text"
+      name="discount"
+      placeholder="{{ placeholder }}"
+      autocomplete="off"
+    >
+    <button type="submit">{{ btn_text }}</button>
+  </form>
+
+  <p class="discount__feedback"></p>
+
+  <ul class="discount__list">
+    {% for discount in cart.discount_applications %}
+      <li class="discount__item" data-code="{{ discount.title }}" data-target="{{ discount.target_type }}">
+        <span>{{ discount.title }}</span>
+        <button type="button" class="discount__remove">×</button>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% javascript %}
+  const form = document.querySelector('.discount__form');
+  const error = document.querySelector('.discount__error');
+  const newCartItems = document.querySelector('cart-items');
+  const feedback = document.querySelector('.discount__feedback');
+  const button = document.querySelector('.discount__form button');
+  if (button && !button.dataset.originalText) {
+    button.dataset.originalText = button.textContent;
+  }
+
+  function getDiscounts() {
+    return Array.from(document.querySelectorAll('.discount__item'))
+      .map((el) => el.dataset.code)
+      .filter(Boolean);
+  }
+
+  function setLoading(state) {
+    if (!button) return;
+    button.disabled = state;
+    button.textContent = state ? 'Aplicando...' : button.dataset.originalText || button.textContent;
+  }
+
+  function showMessage(type, message) {
+    if (!feedback) return;
+
+    feedback.textContent = message;
+    feedback.classList.add('discount__feedback-active');
+    feedback.style.color = type === 'success' ? 'green' : '#d72c2c';
+
+    setTimeout(() => {
+      clearMessage();
+    }, 2000);
+  }
+
+  function clearMessage() {
+    if (!feedback) return;
+    feedback.classList.remove('discount__feedback-active');
+    setTimeout(() => {
+      feedback.textContent = '';
+    }, 900);
+  }
+
+  async function sendDiscounts(discounts) {
+    try {
+      if (!newCartItems) return;
+
+      const sections = newCartItems.getSectionsToRender();
+
+      const body = JSON.stringify({
+        discount: discounts.join(','),
+        sections: sections.map((s) => s.section),
+        sections_url: window.location.pathname,
+      });
+
+      const response = await fetch(`${routes.cart_update_url}`, {
+        ...fetchConfig(),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body,
+      });
+
+      const state = await response.text();
+      const parsedState = JSON.parse(state);
+
+      sections.forEach((section) => {
+        const elementToReplace =
+          document.getElementById(section.id)?.querySelector(section.selector) || document.getElementById(section.id);
+
+        if (!elementToReplace) return;
+
+        const html = parsedState.sections?.[section.section];
+        if (!html) return;
+
+        elementToReplace.innerHTML = newCartItems.getSectionInnerHTML(html, section.selector);
+      });
+
+      publish?.(PUB_SUB_EVENTS.cartUpdate, {
+        source: 'discounts',
+        cartData: parsedState,
+        isInputData: true,
+      });
+
+      return parsedState;
+    } catch (e) {
+      console.log(e);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+
+    setLoading(false);
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const input = form.querySelector('input[name="discount"]');
+    const value = input.value.trim();
+
+    if (!value) return;
+
+    const discounts = getDiscounts();
+
+    clearMessage();
+    setLoading(true);
+    const parsedState = await sendDiscounts([...discounts, value]);
+    if (!parsedState) return;
+
+    const discount = parsedState?.discount_codes?.find((d) => d.code === value);
+
+    if (!discount) {
+      showMessage('error', 'Cupom inválido.');
+      return;
+    }
+
+    if (discount.applicable === false) {
+      showMessage('error', 'Cupom não é aplicável ao carrinho.');
+      return;
+    }
+
+    showMessage('success', 'Cupom aplicado com sucesso!');
+
+    const container = document.querySelector('.discount__list');
+
+    container?.insertAdjacentHTML(
+      'beforeend',
+      `<div class="discount__item" data-code="${value}">
+        ${value}
+        <button class="discount__remove">x</button>
+      </div>`
+    );
+
+    input.value = '';
+  });
+
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.discount__remove');
+    if (!btn) return;
+
+    const item = btn.closest('.discount__item');
+    if (!item) return;
+
+    const code = item.dataset.code;
+
+    const discounts = getDiscounts().filter((c) => c !== code);
+
+    await sendDiscounts(discounts);
+
+    item.remove();
+  });
+
+  function renderDiscountsFromCart(cartData) {
+    const container = document.querySelector('.discount__list');
+    if (!container) return;
+
+    const cartLevelDiscounts = (cartData?.discounts || []).map((d) => d.title).filter(Boolean);
+
+    const lineLevelDiscounts = [
+      ...new Set(
+        (cartData?.items || [])
+          .flatMap((item) => item.line_level_discount_allocations || [])
+          .map((d) => d.discount_application?.title)
+          .filter(Boolean)
+      ),
+    ];
+
+    const allDiscounts = [...new Set([...cartLevelDiscounts, ...lineLevelDiscounts])];
+
+    if (!allDiscounts.length) {
+      container.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML = allDiscounts
+      .map(
+        (title) => `
+      <div class="discount__item" data-code="${title}">
+        <span class="discount__title">${title}</span>
+        <button type="button" class="discount__remove">x</button>
+      </div>
+    `
+      )
+      .join('');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.subscribe) return;
+
+    subscribe(PUB_SUB_EVENTS.cartUpdate, (event) => {
+      const cart = event?.cartData;
+      const isInputData = event?.isInputData || false;
+      if (!cart || isInputData == true) return;
+
+      renderDiscountsFromCart(cart);
+    });
+  });
+{% endjavascript %}

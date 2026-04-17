@@ -10,6 +10,13 @@
     "cart-footer": {
       "type": "main-cart-footer",
       "blocks": {
+        "discount_input_rdJQrp": {
+          "type": "discount-input",
+          "settings": {
+            "placeholder": "Digite seu cupom",
+            "btn_text": "Aplicar"
+          }
+        },
         "subtotal": {
           "type": "subtotal",
           "settings": {
@@ -22,6 +29,7 @@
         }
       },
       "block_order": [
+        "discount_input_rdJQrp",
         "subtotal",
         "buttons"
       ]

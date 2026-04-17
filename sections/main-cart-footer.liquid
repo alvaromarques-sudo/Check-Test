@@ -42,6 +42,8 @@
           {%- case block.type -%}
             {%- when '@app' -%}
               {% render block %}
+            {% when 'discount-input' %}
+              {% render 'coupon-input', block: block %}
             {%- when 'subtotal' -%}
               <div class="js-contents" {{ block.shopify_attributes }}>
                 <div>
@@ -147,7 +149,7 @@
     {
       "type": "header",
       "content": "t:sections.all.padding.section_padding_heading"
-    },    
+    },
     {
       "type": "range",
       "id": "padding_top",
@@ -179,6 +181,25 @@
       "type": "buttons",
       "name": "t:sections.main-cart-footer.blocks.buttons.name",
       "limit": 1
+    },
+    {
+      "type": "discount-input",
+      "name": "Discount Input",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "label": "Placeholder",
+          "id": "placeholder",
+          "default": "Digite seu cupom"
+        },
+        {
+          "type": "text",
+          "label": "Button Text",
+          "id": "btn_text",
+          "default": "Aplicar"
+        }
+      ]
     },
     {
       "type": "@app"
